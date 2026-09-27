@@ -4,6 +4,10 @@
 > dialogue as one continuous passage instead of line by line, and returns it on the
 > original timings. Free to run. Everyone uses their own Gemini API key.
 
+<p align="center">
+  <a href="https://github.com/sponsors/Guy89a"><img src="images/coffee.svg" alt="Buy me a coffee" height="48"></a>
+</p>
+
 One server gives you every language. You pick one by putting its three-letter code in the
 install address, so you can add a language at any time without deploying again.
 
@@ -281,6 +285,16 @@ use it. So treat that address like a password.
 
 The English subtitles come from the public OpenSubtitles addon, the same one Stremio comes
 with. This addon does not host or share any subtitles of its own.
+
+---
+
+## Support
+
+The addon is free and stays free. If it made an episode easier to follow, you can
+[buy me a coffee](https://github.com/sponsors/Guy89a). It helps me keep up with new
+Stremio versions and model changes. A star on the repo helps other people find it too.
+
+<a href="https://github.com/sponsors/Guy89a"><img src="images/coffee.svg" alt="Buy me a coffee" height="40"></a>
 
 ---
 
