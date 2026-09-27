@@ -3,13 +3,13 @@ $ErrorActionPreference = 'Stop'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $dir = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $dir
-$host.UI.RawUI.WindowTitle = 'Hebrew Subs - Install'
+$host.UI.RawUI.WindowTitle = 'AI Subtitles - Install'
 
 function Say($t, $c = 'Gray') { Write-Host "  $t" -ForegroundColor $c }
 function Stop-Here($msg) { Say ''; Say $msg 'Red'; Say ''; Read-Host '  Press Enter to close'; exit 1 }
 
 Write-Host ''
-Say 'Hebrew AI Subtitles for Stremio - installer' 'Cyan'
+Say 'AI Subtitles for Stremio - installer' 'Cyan'
 Say '==========================================' 'Cyan'
 Say 'Everything below is free. You will need two accounts:' 'DarkGray'
 Say 'Google AI Studio (for the translation) and ngrok (for the address).' 'DarkGray'
@@ -140,7 +140,7 @@ Say "https://$domain/manifest.json" 'White'
 try { Set-Clipboard -Value "https://$domain/manifest.json"; Say '(copied to clipboard)' 'DarkGray' } catch { }
 Say ''
 Say 'To watch: double-click START.bat, wait for READY, then open an episode' 'Gray'
-Say 'in Stremio and pick Hebrew in the subtitle menu.' 'Gray'
+Say 'in Stremio and pick your language in the subtitle menu.' 'Gray'
 Say '------------------------------------------------------------' 'Cyan'
 Write-Host ''
 Read-Host '  Press Enter to close'

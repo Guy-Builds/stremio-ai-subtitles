@@ -19,8 +19,8 @@ services:
       - key: GEMINI_API_KEY
         sync: false
 
-      # Which language to translate into by default (ISO 639-2, e.g. heb,
-      # spa, fre, jpn). Leave it blank for Hebrew. Any other language is also
+      # Your language (ISO 639-2, e.g. spa, fre, jpn, heb). It is used when the
+      # install address carries no language code. Any other language is also
       # reachable without redeploying, by putting its code in the install
       # address: https://<service>.onrender.com/spa/manifest.json
       - key: TARGET_LANG

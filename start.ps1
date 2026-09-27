@@ -1,11 +1,11 @@
 $ErrorActionPreference = 'Stop'
 $dir = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $dir
-$host.UI.RawUI.WindowTitle = 'Hebrew Subs - Launcher'
+$host.UI.RawUI.WindowTitle = 'AI Subtitles - Launcher'
 function Fail($msg) { Write-Host ''; Write-Host "  $msg" -ForegroundColor Red; Write-Host ''; Read-Host '  Press Enter to close'; exit 1 }
 
 Write-Host ''
-Write-Host '  Hebrew Subtitles for Stremio' -ForegroundColor Cyan
+Write-Host '  AI Subtitles for Stremio' -ForegroundColor Cyan
 Write-Host '  ============================'
 
 $ngrok = Join-Path $dir 'ngrok.exe'
@@ -32,11 +32,11 @@ if ($busy) {
 
 Write-Host '  [1/3] starting the addon server...'
 Start-Process powershell -ArgumentList @('-NoExit','-NoProfile','-Command',
-  "`$host.UI.RawUI.WindowTitle='Hebrew Subs - SERVER'; Set-Location '$dirQ'; node --env-file=.env src/boot.js") | Out-Null
+  "`$host.UI.RawUI.WindowTitle='AI Subtitles - SERVER'; Set-Location '$dirQ'; node --env-file=.env src/boot.js") | Out-Null
 
 Write-Host '  [2/3] opening the tunnel...'
 Start-Process powershell -ArgumentList @('-NoExit','-NoProfile','-Command',
-  "`$host.UI.RawUI.WindowTitle='Hebrew Subs - TUNNEL'; Set-Location '$dirQ'; .\ngrok.exe http 7788 --url https://$domain") | Out-Null
+  "`$host.UI.RawUI.WindowTitle='AI Subtitles - TUNNEL'; Set-Location '$dirQ'; .\ngrok.exe http 7788 --url https://$domain") | Out-Null
 
 Write-Host '  [3/3] checking that the addon answers over the tunnel...'
 $ok = $false

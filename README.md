@@ -22,14 +22,14 @@ numbered lines, in the target language's word order.
 the process stops. You never get subtitles that are out of sync.
 
 <p align="center">
-  <a href="https://github.com/sponsors/Guy89a"><img src="images/coffee.svg" alt="Buy me a coffee" height="40"></a>
+  <a href="https://github.com/sponsors/Guy-Builds"><img src="images/coffee.svg" alt="Buy me a coffee" height="40"></a>
 </p>
 
 ---
 
 ## Install
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Guy89a/stremio-ai-subtitles)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Guy-Builds/stremio-ai-subtitles)
 
 Press the button. You need to fill in two fields:
 
@@ -48,8 +48,8 @@ https://<your-service>.onrender.com/<language-code>/manifest.json
 addon in another language:
 
 ```
-.../heb/manifest.json     Hebrew
 .../spa/manifest.json     Spanish
+.../fre/manifest.json     French
 .../jpn/manifest.json     Japanese
 ```
 
@@ -214,7 +214,7 @@ Environment variables. All optional except the key.
 |---|---|---|
 | `GEMINI_API_KEY` | — | Your key. Empty means public mode, where each visitor configures their own on the front page |
 | `SECRET` | generated | Encrypts a user's key into their personal install address. **Do not change after deploying** |
-| `TARGET_LANG` | `heb` | Default target language. Any code from the table |
+| `TARGET_LANG` | `heb` | The language for an install address without a code. Any code from the table |
 | `GEMINI_MODEL` | `gemini-flash-latest` | The model that translates. Flash chooses words better than Flash-Lite |
 | `GEMINI_FALLBACK` | `gemini-flash-lite-latest` | Used when the main model is busy or its free daily quota runs out. Empty = no fallback |
 | `CHUNK_SIZE` | `80` | Lines per request. Larger gives better context, but is blocked more often |
@@ -291,10 +291,10 @@ with. This addon does not host or share any subtitles of its own.
 ## Support
 
 The addon is free and stays free. If it made an episode easier to follow, you can
-[buy me a coffee](https://github.com/sponsors/Guy89a). It helps me keep up with new
+[buy me a coffee](https://github.com/sponsors/Guy-Builds). It helps me keep up with new
 Stremio versions and model changes. A star on the repo helps other people find it too.
 
-<a href="https://github.com/sponsors/Guy89a"><img src="images/coffee.svg" alt="Buy me a coffee" height="40"></a>
+<a href="https://github.com/sponsors/Guy-Builds"><img src="images/coffee.svg" alt="Buy me a coffee" height="40"></a>
 
 ---
 

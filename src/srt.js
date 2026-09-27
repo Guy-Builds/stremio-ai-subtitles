@@ -106,7 +106,7 @@ function cueToSource(cue) {
     .trim();
 }
 
-// Re-wrap Hebrew output to at most 2 lines of ~maxLen chars.
+// Re-wrap translated output to at most 2 lines of ~maxLen chars.
 function wrap(text, maxLen = 42) {
   const t = text.replace(/\s+/g, ' ').trim();
   if (t.length <= maxLen) return [t];

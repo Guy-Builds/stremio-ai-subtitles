@@ -37,12 +37,12 @@ The key looks like `AQ.xxxxx…` or `AIzaSy…`. Both are valid.
 
 Press this button:
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Guy89a/stremio-ai-subtitles)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Guy-Builds/stremio-ai-subtitles)
 
 If the button does not work, the full address is:
 
 ```
-https://render.com/deploy?repo=https://github.com/Guy89a/stremio-ai-subtitles
+https://render.com/deploy?repo=https://github.com/Guy-Builds/stremio-ai-subtitles
 ```
 
 If you do not have a Render account you will be asked to sign up. It is free and takes a
@@ -60,9 +60,9 @@ Three fields appear at the top:
 Scroll down. Two fields matter:
 
 - `GEMINI_API_KEY` — **paste the key from step 1 here.**
-- `TARGET_LANG` — the language you want. Use a code from the
-  [table in the README](README.md#languages), for example `spa` for Spanish. Leave it
-  empty for Hebrew. You can use other languages later without deploying again.
+- `TARGET_LANG` — the language you want, as a code from the
+  [table in the README](README.md#languages): for example `spa` for Spanish, `fre` for
+  French, `jpn` for Japanese. You can add other languages later without deploying again.
 
 <img src="images/03-render-fields.png" width="640" alt="The two fields to fill in: GEMINI_API_KEY and TARGET_LANG">
 
@@ -103,8 +103,8 @@ You should get back something like this:
 The install address is your address, plus the language code, plus `/manifest.json`:
 
 ```
-https://your-address.onrender.com/heb/manifest.json     Hebrew
 https://your-address.onrender.com/spa/manifest.json     Spanish
+https://your-address.onrender.com/fre/manifest.json     French
 https://your-address.onrender.com/jpn/manifest.json     Japanese
 ```
 
@@ -262,7 +262,7 @@ On the service page on Render, under **Environment**. Changing one redeploys aut
 
 | Field | Default | What it does |
 |---|---|---|
-| `TARGET_LANG` | `heb` | Default language. Any code from the table |
+| `TARGET_LANG` | `heb` | The language for an install address without a code. Any code from the table |
 | `CHUNK_SIZE` | `80` | Lines per request. Larger gives better context, but is blocked more often |
 | `MIN_SPLIT` | `2` | How far to keep splitting a blocked chunk. Lower leaves less English, but is slower |
 | `CONCURRENCY` | `1` | Requests at the same time. Do not raise it. This is what uses up the per-minute quota |

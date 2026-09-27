@@ -1,3 +1,3 @@
 @echo off
-title Hebrew Subs - Install
+title AI Subtitles - Install
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0install.ps1"
