@@ -4,10 +4,6 @@
 > dialogue as one continuous passage instead of line by line, and returns it on the
 > original timings. Free to run. Everyone uses their own Gemini API key.
 
-<p align="center">
-  <a href="https://github.com/sponsors/Guy89a"><img src="images/coffee.svg" alt="Buy me a coffee" height="48"></a>
-</p>
-
 One server gives you every language. You pick one by putting its three-letter code in the
 install address, so you can add a language at any time without deploying again.
 
@@ -24,6 +20,10 @@ numbered lines, in the target language's word order.
 
 **Timings never move.** The file is checked before it is written. If any line has moved,
 the process stops. You never get subtitles that are out of sync.
+
+<p align="center">
+  <a href="https://github.com/sponsors/Guy89a"><img src="images/coffee.svg" alt="Buy me a coffee" height="40"></a>
+</p>
 
 ---
 
