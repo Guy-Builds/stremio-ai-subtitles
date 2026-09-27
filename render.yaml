@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: hebrew-subs
+    name: ai-subtitles
     runtime: node
     plan: free
     buildCommand: npm install --omit=dev
