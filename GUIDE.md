@@ -61,7 +61,7 @@ Scroll down. Two fields matter:
 
 - `GEMINI_API_KEY` — **paste the key from step 1 here.**
 - `TARGET_LANG` — the language you want, as a code from the
-  [table in the README](README.md#languages): for example `spa` for Spanish, `fre` for
+  [table in the README](README.md#languages): for example `spl` for Latin American Spanish, `fre` for
   French, `jpn` for Japanese. You can add other languages later without deploying again.
 
 <img src="images/03-render-fields.png" width="640" alt="The two fields to fill in: GEMINI_API_KEY and TARGET_LANG">
@@ -103,7 +103,7 @@ You should get back something like this:
 The install address is your address, plus the language code, plus `/manifest.json`:
 
 ```
-https://your-address.onrender.com/spa/manifest.json     Spanish
+https://your-address.onrender.com/spl/manifest.json     Spanish (Latin America)
 https://your-address.onrender.com/fre/manifest.json     French
 https://your-address.onrender.com/jpn/manifest.json     Japanese
 ```

@@ -1,6 +1,6 @@
 # AI Subtitles for Stremio
 
-> Translates English subtitles into **55 languages** with a language model. It reads the
+> Translates English subtitles into **56 languages** with a language model. It reads the
 > dialogue as one continuous passage instead of line by line, and returns it on the
 > original timings. Free to run. Everyone uses their own Gemini API key.
 
@@ -48,7 +48,7 @@ https://<your-service>.onrender.com/<language-code>/manifest.json
 addon in another language:
 
 ```
-.../spa/manifest.json     Spanish
+.../spl/manifest.json     Spanish (Latin America)
 .../fre/manifest.json     French
 .../jpn/manifest.json     Japanese
 ```
@@ -77,15 +77,16 @@ deploy again to use another language. Just put its code in the address.
 | `heb` | Hebrew | עברית |
 | `chi` | Chinese (Simplified) | 简体中文 |
 | `hin` | Hindi | हिन्दी |
-| `spa` | Spanish | Español |
+| `spl` | Spanish (Latin America) | Español (Latinoamérica) |
 | `ara` | Arabic | العربية |
-| **⋯** | **50 more languages** | **⋯** |
+| **⋯** | **51 more languages** | **⋯** |
 
 <details>
-<summary><b>Show all 55</b></summary>
+<summary><b>Show all 56</b></summary>
 
 | Code | Language | Native |
 |---|---|---|
+| `spa` | Spanish (Spain) | Español (España) |
 | `fre` | French | Français |
 | `ben` | Bengali | বাংলা |
 | `pob` | Portuguese (Brazil) | Português (Brasil) |

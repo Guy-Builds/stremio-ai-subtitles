@@ -87,6 +87,16 @@ async function main() {
     assert.ok(/European Portuguese/.test(pp) && /autocarro/.test(pp) && /estou a fazer/.test(pp), 'Portugal gets European guidance');
     assert.ok(!/autocarro/.test(pb) || /Never European/.test(pb), 'no crossed wires');
     console.log('✓ Brazilian and European Portuguese are separate, each with its own guidance');
+
+    // Same story for Spanish, asked for on the launch post the same day.
+    const spl = langs.get('spl'), spa = langs.get('spa');
+    assert.strictEqual(spl.code, 'spl');
+    assert.strictEqual(langs.normalize('es-419'), 'spl');
+    assert.strictEqual(langs.normalize('es'), 'spa');
+    const sl = systemPrompt(spl), ss = systemPrompt(spa);
+    assert.ok(/never vosotros/i.test(sl) && /celular/.test(sl), 'Latin America gets ustedes and its vocabulary');
+    assert.ok(/vosotros for the familiar plural/.test(ss) && /móvil/.test(ss), 'Spain keeps vosotros');
+    console.log('✓ Spanish for Spain and for Latin America are separate, each with its own guidance');
   }
 
   // ---- 2. a language never flags its own script as foreign --------------

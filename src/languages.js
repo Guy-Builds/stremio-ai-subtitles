@@ -27,7 +27,8 @@ const LANGUAGES = [
   ['heb', 'Hebrew',            'עברית',               'hebrew',   true,  true,  false],
   ['chi', 'Chinese (Simplified)', '简体中文',          'han',      false, false, true ],
   ['hin', 'Hindi',             'हिन्दी',                'devanagari', false, true, true ],
-  ['spa', 'Spanish',           'Español',             'latin',    false, true,  true ],
+  ['spl', 'Spanish (Latin America)', 'Español (Latinoamérica)', 'latin', false, true, true ],
+  ['spa', 'Spanish (Spain)',   'Español (España)',    'latin',    false, true,  true ],
   ['ara', 'Arabic',            'العربية',              'arabic',   true,  true,  false],
   ['fre', 'French',            'Français',            'latin',    false, true,  true ],
   ['ben', 'Bengali',           'বাংলা',                'bengali',  false, false, true ],
@@ -89,8 +90,14 @@ const FORMS = {
   heb: { gender: 'אתה / את / אתם / אתן' },
   ara: { gender: 'أنتَ / أنتِ / أنتما / أنتم / أنتن' },
   urd: { gender: 'تم / آپ, with verb and adjective agreement', formal: 'تم (familiar) / آپ (polite)' },
+  // Spain and Latin America, like Brazil and Portugal, each read the other's
+  // subtitles as foreign: vosotros, vocabulary, and a dozen everyday words.
+  spl: { gender: 'adjectives and participles agree: cansado / cansada, and nosotros / nosotras',
+         formal: 'tú (familiar) / usted (polite); for more than one person always ustedes, never vosotros',
+         variety: 'neutral Latin American Spanish, understood from Mexico to Argentina - ustedes (never vosotros), Latin American vocabulary (carro, celular, computadora, jugo, manejar), no Spain-only slang and no strongly local slang of any one country. Never Spain forms' },
   spa: { gender: 'adjectives and participles agree: cansado / cansada, and vosotros / vosotras',
-         formal: 'tú (familiar) / usted (polite), and the verb form that goes with each' },
+         formal: 'tú (familiar) / usted (polite), and vosotros for familiar plural',
+         variety: 'Spanish as spoken in Spain - vosotros for the familiar plural, Spain vocabulary (coche, móvil, ordenador, zumo, conducir). Never Latin American forms' },
   // Brazil and Portugal differ in vocabulary, grammar and forms of address,
   // enough that one reads as foreign to the other. Each gets its own row.
   pob: { gender: 'adjectives and participles agree: obrigado / obrigada',
@@ -193,7 +200,8 @@ for (const [code, name, native, script, rtl, gender2p, formality] of LANGUAGES) 
 const ALIASES = {
   heb: ['he', 'iw', 'hebrew'],      ara: ['ar', 'arabic'],
   fas: ['fa', 'per', 'persian', 'farsi'], urd: ['ur', 'urdu'],
-  spa: ['es', 'esp', 'spanish', 'castellano'], por: ['pt', 'pt-pt', 'portuguese'],
+  spa: ['es', 'es-es', 'esp', 'spanish', 'castellano'],
+  spl: ['es-419', 'es-mx', 'es-la', 'latino', 'latam'], por: ['pt', 'pt-pt', 'portuguese'],
   pob: ['pt-br', 'ptbr', 'brazilian'],
   fre: ['fr', 'fra', 'french'],     ita: ['it', 'italian'],
   ger: ['de', 'deu', 'german'],     dut: ['nl', 'nld', 'dutch'],
