@@ -279,7 +279,7 @@ function manifest(configured, lang) {
     // exception: it keeps the id it was published under, so the people who
     // already had this installed are not asked to install it again.
     id: L.code === 'heb' ? 'community.hebrew.ai.subtitles' : `community.ai.subtitles.${L.code}`,
-    version: '2.2.3',
+    version: '2.2.4',
     name: `${L.native} (AI)`,
     description:
       `Translates English subtitles into ${L.name} with a language model. ` +
@@ -365,7 +365,10 @@ let global_ = { day: -1, episodes: new Set() };
 // meant a deployment with its own key counted nobody at all.
 function callerId(req, token) {
   if (token) return 'k:' + secret.fingerprint(token);
-  const fwd = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+  // The last X-Forwarded-For entry is the one the hosting proxy added. The
+  // earlier ones are whatever the caller chose to send, so trusting the first
+  // let anyone pose as a new visitor on every request.
+  const fwd = String(req.headers['x-forwarded-for'] || '').split(',').pop().trim();
   return 'ip:' + (fwd || (req.socket && req.socket.remoteAddress) || 'unknown');
 }
 
@@ -631,6 +634,8 @@ process.on('unhandledRejection', (e) => log('unhandled rejection:', (e && e.stac
 process.on('uncaughtException', (e) => log('uncaught exception:', (e && e.stack) || e));
 
 module.exports = server;
+// Exposed for the tests only.
+module.exports._callerId = callerId;
 
 server.listen(PORT, '0.0.0.0', () => {
   const ip = lanAddress();

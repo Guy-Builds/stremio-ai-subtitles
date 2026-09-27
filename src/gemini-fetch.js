@@ -77,7 +77,9 @@ function install(opts = {}) {
 
   const wrapped = async function (url, opts2) {
     const u = String(url);
-    if (u.indexOf('generativelanguage.googleapis.com') < 0) return ORIG(url, opts2);
+    let host = '';
+    try { host = new URL(u).hostname; } catch { /* not a URL we handle */ }
+    if (host !== 'generativelanguage.googleapis.com') return ORIG(url, opts2);
 
     const now = Date.now();
     const first = modelOf(u);
@@ -126,6 +128,13 @@ function install(opts = {}) {
             log(`   ${order[t]}: daily quota used up, and no other model left to try`);
           }
           break; // straight to the next model, no waiting
+        }
+
+        // A bad or revoked key is not a settings problem. Changing the shared
+        // settings over it would change them for every other user too.
+        if (/API_KEY_INVALID|API key not valid|API_KEY_/i.test(txt) || res.status === 401 || res.status === 403) {
+          last = res;
+          break;
         }
 
         if (res.status === 400 && noThink && /think/i.test(txt)) {

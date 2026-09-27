@@ -25,6 +25,10 @@ const CONCURRENCY = parseInt(process.env.CONCURRENCY || '3', 10);
 // How many times a flawed or missing line is asked for again. Each round only
 // resends the lines that are still wrong, so a second round is usually tiny.
 const REDO_ROUNDS = parseInt(process.env.REDO_ROUNDS || '2', 10);
+const MAX_CUES = parseInt(process.env.MAX_CUES || '5000', 10);
+// Per-episode request budget: a fixed allowance plus a few per chunk.
+const REQ_BASE = 20;
+const REQ_PER_CHUNK = 8;
 
 // The instructions are assembled from what the target language actually
 // requires, not written out per language. Four properties decide it: the
@@ -149,7 +153,7 @@ function buildPrompt(chunk, before, after, lang, glossary) {
   return p;
 }
 
-async function callGemini(apiKey, prompt, { temperature = 0.3, retries = RETRIES, log, withRef = false, withSpk = false, lang, schema } = {}) {
+async function callGemini(apiKey, prompt, { temperature = 0.3, retries = RETRIES, log, withRef = false, withSpk = false, lang, schema, budget } = {}) {
   const body = {
     systemInstruction: { parts: [{ text: systemPrompt(lang) + (withRef ? REF_RULES : '') + (withSpk ? sdhRules(lang) : '') }] },
     contents: [{ role: 'user', parts: [{ text: prompt }] }],
@@ -181,6 +185,10 @@ async function callGemini(apiKey, prompt, { temperature = 0.3, retries = RETRIES
   // fall through to the next one.
   for (const model of MODELS) {
     for (let attempt = 0; attempt < retries; attempt++) {
+      // Every request counts against the episode's budget, retries included.
+      if (budget && budget.left-- <= 0) {
+        throw Object.assign(new Error('request budget for this episode used up'), { budget: true });
+      }
       try {
         const res = await fetch(`${API_BASE}/${model}:generateContent`, {
           method: 'POST',
@@ -204,10 +212,21 @@ async function callGemini(apiKey, prompt, { temperature = 0.3, retries = RETRIES
         const text = (json.candidates?.[0]?.content?.parts || [])
           .map((p) => p.text || '')
           .join('');
-        if (!text) throw new Error('empty response from gemini');
+        if (!text) {
+          // Google's content filter refused this passage. Asking again gets
+          // the same answer, so it is not retried here: the caller splits the
+          // chunk instead, to find the few lines that trip the filter.
+          const c = json.candidates?.[0] || {};
+          const why = json.promptFeedback?.blockReason || c.finishReason || '';
+          if (/SAFETY|PROHIBITED|BLOCKLIST|SPII|OTHER/i.test(why)) {
+            throw Object.assign(new Error(`blocked by the content filter (${why})`), { blocked: true });
+          }
+          throw new Error('empty response from gemini');
+        }
         return JSON.parse(text);
       } catch (e) {
         lastErr = e;
+        if (e.blocked) throw e;
         if (e.nextModel) break;
         if (attempt === retries - 1) break;
         // 2s, 5s, 11s, 23s, 47s … capped at 60s, plus jitter.
@@ -234,7 +253,7 @@ function looksTruncated(src, out, lang) {
   return b.length / a.length < (lang.maxLine <= 20 ? 0.15 : 0.4);
 }
 
-async function translateChunk(apiKey, chunk, before, after, log, lang, glossary) {
+async function translateChunk(apiKey, chunk, before, after, log, lang, glossary, budget) {
   const want = new Set(chunk.map((c) => c.n));
   const srcOf = new Map(chunk.map((c) => [c.n, c.text || c.ref || '']));
   const out = new Map();
@@ -260,7 +279,7 @@ async function translateChunk(apiKey, chunk, before, after, log, lang, glossary)
     }
   };
 
-  absorb(await callGemini(apiKey, buildPrompt(chunk, before, after, lang, glossary), { log, withRef, withSpk, lang }));
+  absorb(await callGemini(apiKey, buildPrompt(chunk, before, after, lang, glossary), { log, withRef, withSpk, lang, budget }));
 
   for (let round = 1; round <= REDO_ROUNDS; round++) {
     const missing = chunk.filter((c) => !out.has(c.n));
@@ -285,7 +304,7 @@ async function translateChunk(apiKey, chunk, before, after, log, lang, glossary)
       await callGemini(
         apiKey,
         buildPrompt(missing, before.concat(chunk.slice(0, 6)), after, lang, glossary) + note,
-        { temperature: round === 1 ? 0.1 : 0, log, withRef, withSpk, lang }
+        { temperature: round === 1 ? 0.1 : 0, log, withRef, withSpk, lang, budget }
       )
     );
   }
@@ -309,10 +328,14 @@ async function translateChunk(apiKey, chunk, before, after, log, lang, glossary)
 // stretch that actually trips the filter ends up staying in English.
 const MIN_SPLIT = parseInt(process.env.MIN_SPLIT || '8', 10);
 
-async function bisect(apiKey, chunk, before, after, log, label, lang, glossary) {
+async function bisect(apiKey, chunk, before, after, log, label, lang, glossary, budget) {
   try {
-    return await translateChunk(apiKey, chunk, before, after, log, lang, glossary);
+    return await translateChunk(apiKey, chunk, before, after, log, lang, glossary, budget);
   } catch (e) {
+    if (e.budget) {
+      log(`  ! ${label}: request budget used up - ${chunk.length} lines left in English`);
+      return new Map();
+    }
     if (chunk.length <= MIN_SPLIT) {
       log(`  ! ${label}: ${chunk.length} lines could not be translated - left in English`);
       return new Map();
@@ -321,8 +344,8 @@ async function bisect(apiKey, chunk, before, after, log, label, lang, glossary) 
     const a = chunk.slice(0, mid);
     const b = chunk.slice(mid);
     log(`  > ${label} failed (${e.message.slice(0, 50)}) - splitting ${chunk.length} into ${a.length}+${b.length}`);
-    const ra = await bisect(apiKey, a, before, b.slice(0, CONTEXT).concat(after), log, label + '.1', lang, glossary);
-    const rb = await bisect(apiKey, b, before.concat(a.slice(-CONTEXT)), after, log, label + '.2', lang, glossary);
+    const ra = await bisect(apiKey, a, before, b.slice(0, CONTEXT).concat(after), log, label + '.1', lang, glossary, budget);
+    const rb = await bisect(apiKey, b, before.concat(a.slice(-CONTEXT)), after, log, label + '.2', lang, glossary, budget);
     const out = new Map(ra);
     for (const [k, v] of rb) out.set(k, v);
     return out;
@@ -366,7 +389,7 @@ function unquote(s) {
  *
  * @returns {Promise<Map<string,string>>} English name -> target-language form
  */
-async function buildGlossary(apiKey, lines, lang, log) {
+async function buildGlossary(apiKey, lines, lang, log, budget) {
   const names = extractNames(lines);
   if (!names.length) return new Map();
 
@@ -375,6 +398,7 @@ async function buildGlossary(apiKey, lines, lang, log) {
       temperature: 0,
       retries: 2,          // if names are hard to get, the episode still matters more
       log,
+      budget,
       lang,
       schema: {
         type: 'ARRAY',
@@ -434,6 +458,12 @@ async function translateCues(cues, apiKey, onLog, refs, speakers, langCode) {
   const log = onLog || (() => {});
   const lang = langs.get(langCode || process.env.TARGET_LANG || langs.DEFAULT_CODE);
 
+  // A real episode is under 2,000 cues and a long film under 3,000. A file
+  // far past that is not a subtitle track worth spending a quota on.
+  if (cues.length > MAX_CUES) {
+    throw new Error(`too many lines (${cues.length}, the limit is ${MAX_CUES})`);
+  }
+
   // Only cues with actual words go to the model. A cue whose English is empty
   // but whose reference track has text still counts - that is exactly the
   // foreign-dialogue case the English track skipped.
@@ -459,9 +489,16 @@ async function translateCues(cues, apiKey, onLog, refs, speakers, langCode) {
   const withRefCount = verbal.filter((it) => it.ref).length;
   if (withRefCount) log(`reference track covers ${withRefCount}/${verbal.length} lines`);
 
+  // A ceiling on Gemini requests for this one episode, retries and splits
+  // included. A normal episode uses a fraction of it; a file built to trip
+  // the content filter on every line runs into it instead of the owner's
+  // daily quota.
+  const nChunks = Math.ceil(verbal.length / CHUNK);
+  const budget = { left: REQ_BASE + nChunks * REQ_PER_CHUNK };
+
   // Names are settled before any chunk is sent, so all of them agree.
   const glossary = NAMES_PASS
-    ? await buildGlossary(apiKey, verbal.map((it) => it.text), lang, log)
+    ? await buildGlossary(apiKey, verbal.map((it) => it.text), lang, log, budget)
     : new Map();
 
   const chunks = [];
@@ -473,7 +510,7 @@ async function translateCues(cues, apiKey, onLog, refs, speakers, langCode) {
     const before = verbal.slice(Math.max(0, startIdx - CONTEXT), startIdx);
     const after = verbal.slice(startIdx + chunk.length, startIdx + chunk.length + CONTEXT);
     log(`  → chunk ${ci + 1}/${chunks.length} (lines ${chunk[0].n}–${chunk[chunk.length - 1].n})`);
-    return bisect(apiKey, chunk, before, after, log, 'chunk ' + (ci + 1), lang, glossary);
+    return bisect(apiKey, chunk, before, after, log, 'chunk ' + (ci + 1), lang, glossary, budget);
   });
 
   const maps = await pool(tasks, CONCURRENCY);
@@ -498,4 +535,4 @@ async function translateCues(cues, apiKey, onLog, refs, speakers, langCode) {
   return result;
 }
 
-module.exports = { translateCues, systemPrompt, buildGlossary, unquote, looksTruncated, MODEL };
+module.exports = { translateCues, systemPrompt, buildGlossary, unquote, looksTruncated, MODEL, MAX_CUES };

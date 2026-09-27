@@ -1,12 +1,12 @@
 {
   "name": "stremio-ai-subtitles",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "description": "Stremio addon that translates English subtitles to Hebrew with an LLM, preserving the original timing",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
     "translate": "node src/cli.js",
-    "test": "node test/run.js && node test/cloud.js && node test/quality.js && node test/reference.js && node test/security.js && node test/languages.js && node test/names.js && node test/models.js"
+    "test": "node test/run.js && node test/cloud.js && node test/quality.js && node test/reference.js && node test/security.js && node test/languages.js && node test/names.js && node test/models.js && node test/hardening.js"
   },
   "engines": {
     "node": ">=18"

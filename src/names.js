@@ -35,6 +35,9 @@ stay mind careful easy fine good great sure nice cool wow damn hello goodbye
 bye certainly somebody whoa hyah yah hee haw yeehaw huh hmm aha ooh ahh morning evening night afternoon tonight today tomorrow yesterday so still
 even why whatever wherever however anyway alright guys man dude look sit`.split(/\s+/));
 
+const MAX_LINES = 6000;
+const MAX_LINE_LEN = 500;
+
 const TITLES =
   'Mr|Mrs|Ms|Miss|Dr|Prof|Professor|Det|Detective|Sgt|Sergeant|Capt|Captain|' +
   'Lt|Lieutenant|Col|Colonel|Gen|General|Officer|Agent|Judge|Father|Sister|' +
@@ -52,13 +55,21 @@ const TITLES =
  * @returns {{name:string,count:number,sample:string}[]}
  */
 function extractNames(lines, { min = 2, max = 40 } = {}) {
-  const src = lines.map((l) => String(l || ''));
+  // Bounded input. A real subtitle line is well under 100 characters; the
+  // caps only matter for a file built to make this pass slow.
+  const src = lines.slice(0, MAX_LINES).map((l) => String(l || '').slice(0, MAX_LINE_LEN));
 
   // Where a sentence starts, a capital letter says nothing about whether the
   // word is a name. "Call Dr. Chen" is not about someone called Call.
+  // Only the few characters just before the word are looked at, so a long
+  // line costs the same per word as a short one.
   const atSentenceStart = (line, idx) => {
-    const before = line.slice(0, idx).replace(/["'“‘(\[]+$/, '').trimEnd();
-    return before === '' || /[.!?…:]$/.test(before) || /(^|\s)[-–—]$/.test(before);
+    const lead = line.search(/[^\s"'“‘(\[]/);
+    if (lead < 0 || idx <= lead) return true;
+    const from = Math.max(0, idx - 24);
+    const before = line.slice(from, idx).replace(/["'“‘(\[]+$/, '').trimEnd();
+    if (before === '') return from === 0;
+    return /[.!?…:]$/.test(before) || (from === 0 ? /(^|\s)[-–—]$/ : /\s[-–—]$/).test(before);
   };
 
   // Two kinds of evidence that a capitalised word is a name:
@@ -139,18 +150,27 @@ function extractNames(lines, { min = 2, max = 40 } = {}) {
 
   // Drop anything already covered by a longer name: "Billy" inside
   // "Billy the Kid", "Rowe" inside "Detective Rowe".
+  // Names that could never make the final list are dropped first, and
+  // coverage is a set lookup of each kept name's word runs - not a regex per
+  // pair, which a file full of distinct names turned into hours of work.
   const all = [...found.entries()]
     .map(([name, v]) => ({ name, ...v }))
+    .filter((e) => e.count >= min || /\s/.test(e.name)) // a multi-word name counts once
     .sort((a, b) => b.name.length - a.name.length);
   const kept = [];
+  const inside = new Set(); // every run of whole words within a kept name, except the name itself
   for (const entry of all) {
-    const covered = kept.some((k) => k.name !== entry.name &&
-      new RegExp(`(^|\\s)${entry.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(\\s|$)`).test(k.name));
-    if (!covered) kept.push(entry);
+    if (inside.has(entry.name)) continue;
+    kept.push(entry);
+    const w = entry.name.split(/\s+/);
+    for (let i = 0; i < w.length; i++) {
+      for (let j = i + 1; j <= w.length; j++) {
+        if (j - i < w.length) inside.add(w.slice(i, j).join(' '));
+      }
+    }
   }
 
   return kept
-    .filter((e) => e.count >= min || /\s/.test(e.name)) // a multi-word name counts once
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
     .slice(0, max);
 }
