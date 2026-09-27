@@ -39,6 +39,7 @@ function systemPrompt(lang) {
   let p = BASE.replace(/\{LANG\}/g, L);
   if (lang.gender2p) p += gender2pRules(lang);
   if (lang.formality) p += formalityRules(lang);
+  if (lang.forms.variety) p += `\n\nVARIETY — write ${lang.forms.variety}.`;
   p += scriptRules(lang);
   return p;
 }

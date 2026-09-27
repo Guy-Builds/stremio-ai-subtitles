@@ -279,7 +279,7 @@ function manifest(configured, lang) {
     // exception: it keeps the id it was published under, so the people who
     // already had this installed are not asked to install it again.
     id: L.code === 'heb' ? 'community.hebrew.ai.subtitles' : `community.ai.subtitles.${L.code}`,
-    version: '2.2.4',
+    version: '2.2.5',
     name: `${L.native} (AI)`,
     description:
       `Translates English subtitles into ${L.name} with a language model. ` +

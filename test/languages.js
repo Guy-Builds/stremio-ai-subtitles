@@ -74,6 +74,19 @@ async function main() {
       }
     }
     console.log(`✓ ${all.length} languages, every script, alias and flag consistent`);
+
+    // Brazilian and European Portuguese are two languages, not one. A viewer
+    // asked on the launch post; the single "Portuguese" drifted between them.
+    const pob = langs.get('pob'), por = langs.get('por');
+    assert.strictEqual(pob.code, 'pob', 'Brazilian Portuguese must be its own language');
+    assert.strictEqual(langs.normalize('pt-br'), 'pob');
+    assert.strictEqual(langs.normalize('pt'), 'por');
+    const { systemPrompt } = require('../src/translate');
+    const pb = systemPrompt(pob), pp = systemPrompt(por);
+    assert.ok(/Brazilian Portuguese/.test(pb) && /ônibus/.test(pb) && /do not use tu/.test(pb), 'Brazil gets Brazilian guidance');
+    assert.ok(/European Portuguese/.test(pp) && /autocarro/.test(pp) && /estou a fazer/.test(pp), 'Portugal gets European guidance');
+    assert.ok(!/autocarro/.test(pb) || /Never European/.test(pb), 'no crossed wires');
+    console.log('✓ Brazilian and European Portuguese are separate, each with its own guidance');
   }
 
   // ---- 2. a language never flags its own script as foreign --------------

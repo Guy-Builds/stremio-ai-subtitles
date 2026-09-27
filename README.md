@@ -1,6 +1,6 @@
 # AI Subtitles for Stremio
 
-> Translates English subtitles into **54 languages** with a language model. It reads the
+> Translates English subtitles into **55 languages** with a language model. It reads the
 > dialogue as one continuous passage instead of line by line, and returns it on the
 > original timings. Free to run. Everyone uses their own Gemini API key.
 
@@ -79,16 +79,17 @@ deploy again to use another language. Just put its code in the address.
 | `hin` | Hindi | हिन्दी |
 | `spa` | Spanish | Español |
 | `ara` | Arabic | العربية |
-| **⋯** | **49 more languages** | **⋯** |
+| **⋯** | **50 more languages** | **⋯** |
 
 <details>
-<summary><b>Show all 54</b></summary>
+<summary><b>Show all 55</b></summary>
 
 | Code | Language | Native |
 |---|---|---|
 | `fre` | French | Français |
 | `ben` | Bengali | বাংলা |
-| `por` | Portuguese | Português |
+| `pob` | Portuguese (Brazil) | Português (Brasil) |
+| `por` | Portuguese (Portugal) | Português (Portugal) |
 | `rus` | Russian | Русский |
 | `urd` | Urdu | اردو |
 | `ind` | Indonesian | Bahasa Indonesia |
