@@ -279,7 +279,7 @@ function manifest(configured, lang) {
     // exception: it keeps the id it was published under, so the people who
     // already had this installed are not asked to install it again.
     id: L.code === 'heb' ? 'community.hebrew.ai.subtitles' : `community.ai.subtitles.${L.code}`,
-    version: '2.2.5',
+    version: '2.2.6',
     name: `${L.native} (AI)`,
     description:
       `Translates English subtitles into ${L.name} with a language model. ` +
@@ -485,7 +485,10 @@ async function handleSrt(req, res, url) {
 const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') return send(res, 204, '');
 
-  const url = new URL(req.url, 'http://localhost');
+  // A pasted address often ends up as ".com//pob/manifest.json". A path that
+  // starts with two slashes is read as a host name ("pob"), so the language
+  // silently disappeared and the default one was installed instead.
+  const url = new URL(String(req.url || '/').replace(/^\/{2,}/, '/'), 'http://localhost');
   const parts = url.pathname.split('/').filter(Boolean);
 
   // A leading path segment is either a sealed configuration - someone's own

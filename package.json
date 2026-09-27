@@ -1,6 +1,6 @@
 {
   "name": "stremio-ai-subtitles",
-  "version": "2.2.5",
+  "version": "2.2.6",
   "description": "Stremio addon that translates English subtitles into 55 languages with an LLM, preserving the original timing",
   "main": "src/server.js",
   "scripts": {

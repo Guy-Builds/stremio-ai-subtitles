@@ -209,10 +209,14 @@ async function main() {
   assert.notStrictEqual(mEs.id, m0.id, 'the two manifests must not share an id');
   assert.ok(/Español/.test(mEs.name), 'and is named in Spanish');
 
+  // 6b'. a doubled slash from a careless paste still reaches the language
+  const mDbl = await (await realFetch(`${base}//spa/manifest.json`)).json();
+  assert.ok(mDbl.id.endsWith('.spa'), '//spa/manifest.json must give Spanish, not the default language');
+
   // 6c. junk in that position is still refused
   assert.strictEqual((await realFetch(`${base}/NOTALANG/manifest.json`)).status, 404,
     'an unknown prefix must not alias the route');
-  console.log('✓ /manifest.json, /spa/manifest.json and a junk prefix all behave');
+  console.log('✓ /manifest.json, /spa/manifest.json, a doubled slash and a junk prefix all behave');
 
   // 6d. the same episode in two languages is two different cache entries
   const sHe = await (await realFetch(`${base}/subtitles/series/tt1234567:1:4.json`)).json();
